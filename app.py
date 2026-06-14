@@ -24,5 +24,3 @@ if prompt := st.chat_input("မင်္ဂလာပါ... ဘာများက
         st.markdown(response)
     st.session_state.messages.append({"role": "assistant", "content": response})
     
-  
-OPENAI_API_KEY = "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"
