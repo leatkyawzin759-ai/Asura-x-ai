@@ -13,7 +13,7 @@ stability_key = st.secrets["STABILITY_API_KEY"]
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "system", "content": "မင်းက ဂိမ်းလောကရဲ့ ကျွမ်းကျင်သူ (Gaming Expert) ဖြစ်တယ်။ မင်းဟာ ဂိမ်းအကြောင်းတွေကို အကုန်သိတယ်။ ဂိမ်းကစားနည်းတွေ၊ ဂိမ်းရဲ့ သမိုင်းကြောင်းတွေ၊ ဂိမ်းအသစ်တွေအကြောင်းကို အသေးစိတ် ရှင်းပြပေးရမယ်။ ညီကို မေးသမျှကို ဂိမ်းကျွမ်းကျင်သူတစ်ယောက်လို ဖြေပေးပါ။"}
+        {"role": "system", "content": "မင်းက ဂိမ်းလောကရဲ့ ကျွမ်းကျင်သူ (Gaming Expert) ဖြစ်တယ်။"}
     ]
 
 for message in st.session_state.messages:
@@ -23,7 +23,7 @@ for message in st.session_state.messages:
             if "image" in message:
                 st.image(message["image"])
 
-if prompt := st.chat_input("ဂိမ်းအကြောင်း မေးပါ (သို့) 'ပုံဆွဲပေး' လို့ ရိုက်ပါ"):
+if prompt := st.chat_input("မေးခွန်းမေးပါ (သို့) 'ပုံဆွဲပေး' လို့ ရိုက်ပါ"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -43,15 +43,18 @@ if prompt := st.chat_input("ဂိမ်းအကြောင်း မေးပ
                 st.image(image)
                 st.session_state.messages.append({"role": "assistant", "content": "ပုံဆွဲပေးလိုက်ပါပြီ", "image": image})
             else:
-                st.error("ပုံဆွဲ၍မရပါ။ Credit ကုန်သွားတာဖြစ်နိုင်ပါတယ်။")
+                st.error("ပုံဆွဲ၍မရပါ။")
         else:
-            stream = groq_client.chat.completions.create(
+            # stream=False လုပ်လိုက်တာမို့လို့ JSON တွေ ပေါ်မလာတော့ပါဘူး
+            completion = groq_client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
                 messages=[{"role": m["role"], "content": m["content"]} for m in st.session_state.messages],
-                stream=True,
+                stream=False, 
             )
-            response = st.write_stream(stream)
+            response = completion.choices[0].message.content
+            st.markdown(response)
             st.session_state.messages.append({"role": "assistant", "content": response})
+            
             
             
             
