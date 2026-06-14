@@ -23,14 +23,14 @@ for message in st.session_state.messages:
             if "image" in message:
                 st.image(message["image"])
 
-if prompt := st.chat_input("မေးခွန်းမေးပါ (သို့) 'ပုံဆွဲပေး' လို့ ရိုက်ပါ"):
+if prompt := st.chat_input("Ask Asura"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
         if "ပုံဆွဲ" in prompt:
-            st.write("ပုံဆွဲပေးနေပါပြီ...")
+            st.write("Creating your image...")
             safe_prompt = f"A high quality illustration of: {prompt}"
             response = requests.post(
                 "https://api.stability.ai/v2beta/stable-image/generate/core",
