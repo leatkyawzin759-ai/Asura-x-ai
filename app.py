@@ -6,7 +6,6 @@ st.set_page_config(page_title="Asura AI", page_icon="🤖")
 st.title('Asura AI Chatbot 🤖')
 
 # API Key ကို Secrets ထဲကနေ ခေါ်ယူခြင်း
-# (Streamlit Secrets ထဲမှာ GROQ_API_KEY ဆိုပြီး ထည့်ထားဖို့ လိုပါတယ်)
 try:
     api_key = st.secrets["GROQ_API_KEY"]
     client = Groq(api_key=api_key)
@@ -33,8 +32,7 @@ if prompt := st.chat_input("ဘာများ ကူညီပေးရမလဲ
     with st.chat_message("assistant"):
         try:
             stream = client.chat.completions.create(
-                model"llama-3.3-70b-versatile",
-                ",
+                model="llama-3.3-70b-versatile",
                 messages=st.session_state.messages,
                 stream=True,
             )
@@ -42,6 +40,7 @@ if prompt := st.chat_input("ဘာများ ကူညီပေးရမလဲ
             st.session_state.messages.append({"role": "assistant", "content": response})
         except Exception as e:
             st.error(f"Error ဖြစ်သွားပါတယ်: {e}")
+            
             
         
     
