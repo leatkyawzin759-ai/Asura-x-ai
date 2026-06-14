@@ -3,4 +3,4 @@ groq
 requests
 Pillow
 streamlit-mic-recorder
-
+duckduckgo-search
