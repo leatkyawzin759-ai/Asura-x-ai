@@ -1,10 +1,27 @@
 import streamlit as st
 
-st.title('Asura x AI App')
-st.write('အောင်မြင်စွာ တက်လာပါပြီ!')
+st.title('Asura AI Chatbot')
 
-# အောက်ပါ Code က ညီကို့ကို စာရိုက်လို့ရစေမှာပါ
-name = st.text_input('မင်းနာမည်လေး ပြောပြပေးပါ')
-if name:
-    st.write(f'မင်္ဂလာပါ {name}! Asura AI က ကြိုဆိုပါတယ်။')
+# Chat history ကို သိမ်းထားဖို့
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# အရင်ပြောထားတဲ့ message တွေကို ပြန်ပြပေးခြင်း
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# User ဆီက input ယူခြင်း
+if prompt := st.chat_input("မင်္ဂလာပါ... ဘာများကူညီပေးရမလဲ?"):
+    # User message ကို ပြသခြင်း
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    st.session_state.messages.append({"role": "user", "content": prompt})
+
+    # Chatbot ရဲ့ တုံ့ပြန်မှု (လက်ရှိမှာတော့ Echo လုပ်ထားပါတယ်)
+    response = f"ညီကိုပြောလိုက်တာ - {prompt}"
+    with st.chat_message("assistant"):
+        st.markdown(response)
+    st.session_state.messages.append({"role": "assistant", "content": response})
+    
   
