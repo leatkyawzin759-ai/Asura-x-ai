@@ -1,40 +1,47 @@
 import streamlit as st
 from groq import Groq
 
-st.title('Asura Groq Chatbot')
+# Page Config
+st.set_page_config(page_title="Asura AI", page_icon="🤖")
+st.title('Asura AI Chatbot 🤖')
 
-# API Key ကို လုံခြုံစွာခေါ်ယူခြင်း
-api_key = st.secrets.get("GROQ_API_KEY")
-
-if not api_key:
-    st.error("API Key မတွေ့ရှိပါ။ Streamlit Secrets တွင် GROQ_API_KEY ကို စစ်ဆေးပါ။")
+# API Key ကို Secrets ထဲကနေ ခေါ်ယူခြင်း
+# (Streamlit Secrets ထဲမှာ GROQ_API_KEY ဆိုပြီး ထည့်ထားဖို့ လိုပါတယ်)
+try:
+    api_key = st.secrets["GROQ_API_KEY"]
+    client = Groq(api_key=api_key)
+except Exception as e:
+    st.error("API Key မတွေ့ရှိပါ။ Streamlit Settings > Secrets ထဲတွင် GROQ_API_KEY ထည့်ပေးပါ။")
     st.stop()
 
-client = Groq(api_key=api_key)
-
+# Chat History
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+# Message များကို ပြသခြင်း
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("မင်္ဂလာပါ..."):
+# User Input
+if prompt := st.chat_input("ဘာများ ကူညီပေးရမလဲ?"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
-    st.session_state.messages.append({"role": "user", "content": prompt})
 
-    try:
-        response = client.chat.completions.create(
-            model="llama3-8b-8192",
-            messages=st.session_state.messages
-        )
-        msg = response.choices[0].message.content
-        with st.chat_message("assistant"):
-            st.markdown(msg)
-        st.session_state.messages.append({"role": "assistant", "content": msg})
-    except Exception as e:
-        st.error(f"Error ဖြစ်သွားပါတယ်: {e}")
+    # Groq AI Model ကို ခေါ်ခြင်း
+    with st.chat_message("assistant"):
+        try:
+            stream = client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=st.session_state.messages,
+                stream=True,
+            )
+            response = st.write_stream(stream)
+            st.session_state.messages.append({"role": "assistant", "content": response})
+        except Exception as e:
+            st.error(f"Error ဖြစ်သွားပါတယ်: {e}")
+            
         
     
     
