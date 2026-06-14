@@ -1,3 +1,6 @@
-groq
 streamlit
+groq
+requests
+Pillow
+
 
