@@ -2,6 +2,6 @@ streamlit
 groq
 requests
 Pillow
-streamlit-mic-recorder
 duckduckgo-search
 pypdf
+audio-recorder-streamlit
