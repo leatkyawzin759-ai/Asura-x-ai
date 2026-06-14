@@ -4,3 +4,4 @@ requests
 Pillow
 streamlit-mic-recorder
 duckduckgo-search
+pypdf
