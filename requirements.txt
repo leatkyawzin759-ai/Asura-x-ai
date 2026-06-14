@@ -2,5 +2,5 @@ streamlit
 groq
 requests
 Pillow
-
+streamlit-mic-recorder
 
