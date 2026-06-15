@@ -16,9 +16,9 @@ stability_key = st.secrets["STABILITY_API_KEY"]
 tripo_key = st.secrets.get("TRIPO_API_KEY", "")
 
 # Input များ
-audio_bytes = audio_recorder("အသံသွင်းရန် နှိပ်ပါ", icon_size="2x")
-uploaded_file = st.file_uploader("ဖိုင်တင်ရန် (ပုံ သို့မဟုတ် PDF)", type=['jpg', 'jpeg', 'png', 'pdf'])
-prompt = st.chat_input("မေးခွန်းမေးပါ (သို့) လုပ်ဆောင်ချက်တစ်ခု ပြောပါ...")
+audio_bytes = audio_recorder("voice", icon_size="2x")
+uploaded_file = st.file_uploader("File or pdf)", type=['jpg', 'jpeg', 'png', 'pdf'])
+prompt = st.chat_input("Ask Asura.")
 
 if audio_bytes:
     st.audio(audio_bytes, format="audio/wav")
