@@ -1,67 +1,56 @@
 import streamlit as st
 from groq import Groq
-from duckduckgo_search import DDGS
-from pypdf import PdfReader
+from gtts import gTTS
+import os
 
-# API Keys
-GROQ_API_KEY = "ညီကို့_GROQ_KEY_ထည့်ပါ"
+# 1. API Keys (st.secrets ထဲမှာ ထည့်ထားပေးပါ)
+GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+STABILITY_API_KEY = st.secrets["STABILITY_API_KEY"]
+TRIPO_API_KEY = st.secrets["TRIPO_API_KEY"]
 
 groq_client = Groq(api_key=GROQ_API_KEY)
 
-# 1. Memory စနစ်
+# 2. Page Setup
+st.set_page_config(page_title="Asura AI Pro", page_icon="🤖")
+st.title('Asura AI Pro 🤖')
+
+# 3. Sidebar (Volume & Settings)
+st.sidebar.title("Settings")
+volume = st.sidebar.slider("🔊 Volume Level", 0, 100, 50)
+st.sidebar.info(f"API Keys Loaded: Groq, Stability, Tripo")
+
+# 4. Memory Setup
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-st.set_page_config(page_title="Asura AI Pro", page_icon="🤖")
-st.title('Asura AI Pro 🤖🎮')
-
-# Sidebar မှာ Volume Control ထည့်ခြင်း
-st.sidebar.title("⚙️ Settings")
-volume = st.sidebar.slider("🔊 Volume", 0, 100, 50)
-st.sidebar.write(f"လက်ရှိအသံ - {volume}%")
-
-# UI
-uploaded_file = st.file_uploader("file or pdf", type=['pdf'])
-prompt = st.chat_input("Ask Asura or give mission")
-
-# အရင်ပြောခဲ့တာတွေကို ပြန်ပြရန်
+# Display Chat
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt:
+# 5. Chat Input
+if prompt := st.chat_input("Ask me anything or give a mission..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"): st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        # Volume အမိန့်ကို စစ်ဆေးခြင်း
-        if "volume" in prompt.lower() or "အသံ" in prompt:
-            full_response = f"အသံကို {volume}% သို့ သတ်မှတ်ထားပါသည်။"
-            
-        elif "calculator" in prompt.lower() or "ပေါင်း" in prompt:
-            full_response = "🧮 Calculator စနစ်အဆင်သင့်ရှိပါသည်။"
-            
-        elif uploaded_file and uploaded_file.name.endswith(".pdf"):
-            reader = PdfReader(uploaded_file)
-            text = "".join([page.extract_text() for page in reader.pages])
-            response = groq_client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[{"role": "user", "content": f"PDF အချက်အလက်: {text[:5000]}... မေးခွန်း: {prompt}"}]
-            )
-            full_response = response.choices[0].message.content
-            
-        elif "ရှာ" in prompt or "search" in prompt.lower():
-            with DDGS() as ddgs:
-                results = list(ddgs.text(prompt, max_results=3))
-                full_response = "ရှာဖွေတွေ့ရှိချက်များ:\n" + "\n".join([f"- [{r['title']}]({r['href']})" for r in results])
-        
+        # AI Logic
+        if "3d" in prompt.lower():
+            response_text = f"Tripo AI mission initiated with key: {TRIPO_API_KEY[:4]}..."
+        elif "image" in prompt.lower() or "ပုံဆွဲ" in prompt:
+            response_text = f"Stability AI mission initiated with key: {STABILITY_API_KEY[:4]}..."
         else:
             response = groq_client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
                 messages=st.session_state.messages
             )
-            full_response = response.choices[0].message.content
+            response_text = response.choices[0].message.content
         
-        st.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+        st.markdown(response_text)
+        st.session_state.messages.append({"role": "assistant", "content": response_text})
+
+        # 6. Text-to-Speech (အသံထွက်)
+        tts = gTTS(text=response_text, lang='en')
+        tts.save("response.mp3")
+        st.audio("response.mp3", format="audio/mp3")
         
